@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
@@ -10,7 +10,7 @@ from .models import EquipmentDataset
 
 class UploadCSVView(APIView):
     parser_classes=(MultiPartParser, FormParser)
-    permission_classes=[IsAuthenticated]
+    permission_classes=[AllowAny] #IsAuthenticated later, if needed
 
     def post(self, request):
         if 'file' not in request.FILES:
