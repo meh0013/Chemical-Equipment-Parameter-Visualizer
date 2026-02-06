@@ -6,7 +6,7 @@ from rest_framework import status
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from .utils import analyze_csv
-from .models import EquipmentDataset
+from .models import EquipmentDataset, UploadHistory
 
 class UploadCSVView(APIView):
     parser_classes=(MultiPartParser, FormParser)
@@ -30,35 +30,65 @@ class UploadCSVView(APIView):
             summary=summary
         )
 
+        UploadHistory.objects.create(
+            filename=file.name,
+            summary=summary
+        )
+
+        # Keep only last 5 uploads
+        qs = UploadHistory.objects.order_by("-uploaded_at")
+        if qs.count() > 5:
+            for obj in qs[5:]:
+                obj.delete()
+
         return Response({
             "summary":summary,
             "table":df.to_dict(orient="records")
         })
 
+# class HistoryView(APIView):
+#     permission_classes = [AllowAny]
+
+#     def get(self, request):
+#         datasets = EquipmentDataset.objects.order_by('-uploaded_at')[:5]
+
+#         return Response([
+#             {
+#                 "filename": d.filename,
+#                 "uploaded_at": d.uploaded_at,
+#                 "summary": d.summary
+#             }
+#             for d in datasets
+#         ])
+
 class HistoryView(APIView):
-    def get(self,request):
-        data=Equipment.objects.order_by('-uploadedDate')[:5]
-        return Response([{
-                "file": d.filename,
-                "uploadedDate": d.uploaded_at,
-                "summary": d.summary
-            } for d in data])
+    def get(self, request):
+        data = UploadHistory.objects.order_by('-uploaded_at').values(
+            'filename', 'uploaded_at', 'summary'
+        )
+        return Response(list(data))
 
 class PDFReportView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         latest = EquipmentDataset.objects.latest('uploaded_at')
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
 
-        c = canvas.Canvas(response)
-        c.drawString(50, 800, "Equipment Summary Report")
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="equipment_report.pdf"'
+
+        pdf = canvas.Canvas(response)
+        pdf.setFont("Helvetica", 12)
+
+        pdf.drawString(50, 800, "Chemical Equipment Summary Report")
 
         y = 760
-        for k, v in latest.summary.items():
-            c.drawString(50, y, f"{k}: {v}")
+        for key, value in latest.summary.items():
+            pdf.drawString(50, y, f"{key}: {value}")
             y -= 20
 
-        c.save()
+        pdf.showPage()
+        pdf.save()
+
         return response
+
