@@ -21,3 +21,17 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#Python
+__pycache__/
+*.sqlite3
+.env
+
+#Django
+*.log
+*.pot
+*.py[cod]
+*.swp
+
+#Creds
+backend/db.sqlite3
