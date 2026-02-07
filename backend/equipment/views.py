@@ -7,10 +7,11 @@ from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from .utils import analyze_csv
 from .models import EquipmentDataset, UploadHistory
+from .pdf import generate_pdf
 
 class UploadCSVView(APIView):
     parser_classes=(MultiPartParser, FormParser)
-    permission_classes=[AllowAny] #IsAuthenticated later, if needed
+    permission_classes=[IsAuthenticated] #IsAuthenticated later, if needed
 
     def post(self, request):
         if 'file' not in request.FILES:
@@ -46,27 +47,20 @@ class UploadCSVView(APIView):
             "table":df.to_dict(orient="records")
         })
 
-# class HistoryView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def get(self, request):
-#         datasets = EquipmentDataset.objects.order_by('-uploaded_at')[:5]
-
-#         return Response([
-#             {
-#                 "filename": d.filename,
-#                 "uploaded_at": d.uploaded_at,
-#                 "summary": d.summary
-#             }
-#             for d in datasets
-#         ])
-
 class HistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        data = UploadHistory.objects.order_by('-uploaded_at').values(
-            'filename', 'uploaded_at', 'summary'
-        )
-        return Response(list(data))
+        datasets = EquipmentDataset.objects.order_by('-uploaded_at')[:5]
+
+        return Response([
+            {
+                "filename": d.filename,
+                "uploaded_at": d.uploaded_at,
+                "summary": d.summary
+            }
+            for d in datasets
+        ])
 
 class PDFReportView(APIView):
     permission_classes = [IsAuthenticated]
@@ -91,4 +85,13 @@ class PDFReportView(APIView):
         pdf.save()
 
         return response
+
+class PDFView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        summary = request.data.get("summary")
+        if not summary:
+            return Response({"error": "No summary provided"}, status=400)
+        return generate_pdf(summary)
 
