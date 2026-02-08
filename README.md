@@ -96,3 +96,10 @@ python main.py
 The backend runs at http://localhost:3000/
 
 Make sure the Django backend is running before starting the desktop app.
+
+## 🌍 Deployment (Web Version)
+
+- **Backend API**: https://fossee-chemical-equipment-parameter.onrender.com
+- **Web Application**: https://fossee-chemical-equipment-parameter.vercel.app/
+
+Note: The backend is hosted on a free-tier service and may take a few seconds to wake up on first request.
