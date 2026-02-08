@@ -99,6 +99,13 @@ Make sure the Django backend is running before starting the desktop app.
 
 ## 🌍 Deployment (Web Version)
 
+### Defaults
+
+```
+USERNAME: demo
+PASSWORD: 123123
+``` 
+
 - **Backend API**: https://fossee-chemical-equipment-parameter.onrender.com
 - **Web Application**: https://fossee-chemical-equipment-parameter.vercel.app/
 
