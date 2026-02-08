@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API_BASE_URL from "../utils/config";
+import API_BASE_URL from "./utils/config";
 
 export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
