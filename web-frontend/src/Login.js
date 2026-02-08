@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API_BASE_URL from "../utils/config";
 
 export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
@@ -10,7 +11,7 @@ export default function Login({ setToken }) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/token/", {
+      const res = await fetch(`${API_BASE_URL}/api/token/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

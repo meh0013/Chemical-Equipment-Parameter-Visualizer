@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import Login from "./Login";
+import API_BASE_URL from "./utils/config";
 
 //Chart
 function SingleMetricChart({ label, value, unit }) {
@@ -51,7 +52,7 @@ function App() {
   useEffect(() => {
     if (!token) return; // safe: skip fetching if no token yet
 
-    fetch("http://localhost:8000/api/history/", {
+    fetch(`${API_BASE_URL}/api/history/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -68,7 +69,7 @@ function App() {
     formData.append("file", file);
 
     const res = await axios.post(
-      "http://127.0.0.1:8000/api/upload/",
+      `${API_BASE_URL}/api/upload/`,
       formData,
       {
         headers:{
@@ -86,7 +87,7 @@ function App() {
       return;
     }
 
-    fetch("http://localhost:8000/api/pdf/", {
+    fetch(`${API_BASE_URL}/api/pdf/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
