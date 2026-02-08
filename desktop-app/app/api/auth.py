@@ -6,10 +6,7 @@ def login(self):
             "password": self.password.text()
         }
     )
-
-    print("STATUS:", response.status_code)
-    print("RESPONSE:", response.text)
-
+    
     if response.status_code == 200:
         self.token = response.json().get("token")
         self.accept()
